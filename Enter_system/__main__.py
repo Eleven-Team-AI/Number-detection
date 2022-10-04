@@ -1,7 +1,6 @@
-import gc
+import torch
 import logging
-import os
-import re
+import video_processing
 from datetime import datetime
 from pathlib import Path
 
@@ -12,6 +11,7 @@ import pytz
 import torch
 import yaml
 from IPython.core.display import clear_output
+from PIL import Image
 
 import video_processing
 from yolov5.utils.dataloaders import LoadImages
@@ -33,18 +33,16 @@ def car_detection(frame):
     names = yolo_model.names
     detected = '-'
     for label in labels:
-        # TODO check label
         detected = names[label]
     return detected
 
 
-def plat_detection(frame):
-    results = plat_yolo_model(frame)
-    labels, cord_thres = results.xyxy[0][:, -1].cpu().numpy(), results.xyxy[0][:, :-1].cpu().numpy()
+def plat_detection(img):
+    results = plat_yolo_model(img)
+    labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
     names = plat_yolo_model.names
     detected = '-'
     for label in labels:
-        # TODO check label
         detected = names[label]
         if detected == 'plat-nomor':
             return cord_thres
@@ -85,23 +83,30 @@ def ocr_recognition(path: str) -> str:
 
 
 def masking_video(path_video: str,
+                  path_masked_video: str,
                   frame_size: tuple,
+                  frame_rate: int,
                   coord: list) -> None:
     """
     Function for masking and saving video
     :param path_video: path to video
+    :param path_masked_video: out path
     :param frame_size: frame size
+    :param frame_rate: frame rate
     :param coord: coordinates of mask [(x1, y1), (x2, y2)...]
     :return: None
     """
-    for i in range(len(coord)):
-        coord[i] = tuple(coord[i])
     mask = video_processing.create_mask(frame_size, coord)
     frames = video_processing.video_to_array_optimizing(path_video, frame_size, 3)
     mask_frames = video_processing.apply_mask(frames, mask)
+
+    video_processing.array_to_video(mask_frames,
+                                    path_masked_video,
+                                    'mp4v',
+                                    frame_rate,
+                                    frame_size)
     gc.collect()
     clear_output()
-    return mask_frames
 
 
 def worker():
