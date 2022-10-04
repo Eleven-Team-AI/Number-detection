@@ -20,3 +20,9 @@ constants:
   coord: [[0,0], [0,1], [1,0], [1,1]] 
   path_enter_car: path for cars for enter system
 ```
+Start module
+```bash
+python3 -m Enter_system
+```
+# Models
+# Metrics
