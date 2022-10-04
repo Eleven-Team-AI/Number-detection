@@ -43,12 +43,15 @@ def process_image(path: str) -> np.array:
     """
     image = cv2.imread(path)
     image = cv2.resize(image, (0, 0), fx=3, fy=3)
+
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (3, 3), 0)
     thresh = cv2.threshold(blur, 50, 200, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
     opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
     invert = 255 - opening
+
     return invert
 
 
