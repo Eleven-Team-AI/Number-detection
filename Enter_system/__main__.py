@@ -9,6 +9,7 @@ import easyocr
 import re
 import gc
 from IPython.core.display import clear_output
+from PIL import Image
 
 log = logging.getLogger('enter_system')
 
@@ -97,6 +98,19 @@ def masking_video(path_video: str,
                                     frame_size)
     gc.collect()
     clear_output()
+
+
+def crop_image(image: np.array, coord: list) -> np.array:
+    """
+    Function for crop the image
+    :param image: image as np.array
+    :param coord: tuple
+    :return: np.array
+    """
+    img = Image.fromarray(image)
+    img_crop = img.crop(coord)
+
+    return np.array(img_crop)
 
 
 def main_loop(video):
