@@ -1,19 +1,22 @@
 import torch
 import logging
-from video_processing import apply_mask
+import video_processing
 from datetime import datetime
 import pytz
 import numpy as np
 import cv2
 import easyocr
 import re
+import gc
+from IPython.core.display import clear_output
 
 log = logging.getLogger('enter_system')
 
-yolo_model = torch.hub.load('ultralytics/yolov5', 'yolov5s') 
+yolo_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom', path='./models/plat_model.pt', force_reload=True)
 
-# TODO check parametr for load in function?
+
+# TODO check parameter for load in function?
 def car_detection(img):
     results = yolo_model(img)
     labels = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
@@ -22,7 +25,8 @@ def car_detection(img):
     for label in labels:
         detected = names[label]
     return detected
-        
+
+
 def plat_detection(img):
     results = plat_yolo_model(img)
     labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
@@ -68,6 +72,33 @@ def ocr_recognition(path: str) -> str:
     return text
 
 
+def masking_video(path_video: str,
+                  path_masked_video: str,
+                  frame_size: tuple,
+                  frame_rate: int,
+                  coord: list) -> None:
+    """
+    Function for masking and saving video
+    :param path_video: path to video
+    :param path_masked_video: out path
+    :param frame_size: frame size
+    :param frame_rate: frame rate
+    :param coord: coordinates of mask [(x1, y1), (x2, y2)...]
+    :return: None
+    """
+    mask = video_processing.create_mask(frame_size, coord)
+    frames = video_processing.video_to_array_optimizing(path_video, frame_size, 3)
+    mask_frames = video_processing.apply_mask(frames, mask)
+
+    video_processing.array_to_video(mask_frames,
+                                    path_masked_video,
+                                    'mp4v',
+                                    frame_rate,
+                                    frame_size)
+    gc.collect()
+    clear_output()
+
+
 def main_loop(video):
     # mask_video = 
     # TODO: add mask on video 
@@ -75,4 +106,4 @@ def main_loop(video):
     if detection == 'car' or detection == 'truck':
         moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
         log.info(f'{detection.upper()} detected, start recording')
-        # TODO start saving video 
+        # TODO start saving video
