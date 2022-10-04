@@ -1,6 +1,6 @@
 import torch
 import logging
-import video_processing
+from . import video_processing
 from datetime import datetime
 import pytz
 import numpy as np
@@ -10,30 +10,37 @@ import re
 import gc
 from IPython.core.display import clear_output
 from PIL import Image
+import yaml
+import os
+from pathlib import Path
 
 log = logging.getLogger('enter_system')
 
 yolo_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom', path='./models/plat_model.pt', force_reload=True)
+plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom',
+                                 path=os.path.join(Path(__file__).parents[0],
+                                                   'models', 'plat_model'),
+                                 force_reload=True)
 
 
-# TODO check parameter for load in function?
-def car_detection(img):
-    results = yolo_model(img)
+def car_detection(frame):
+    results = yolo_model(frame)
     labels = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
     names = yolo_model.names
     detected = '-'
     for label in labels:
+        # TODO check label
         detected = names[label]
     return detected
 
 
-def plat_detection(img):
-    results = plat_yolo_model(img)
+def plat_detection(frame):
+    results = plat_yolo_model(frame)
     labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
     names = plat_yolo_model.names
     detected = '-'
     for label in labels:
+        # TODO check label
         detected = names[label]
         if detected == 'plat-nomor':
             return cord_thres
@@ -74,32 +81,50 @@ def ocr_recognition(path: str) -> str:
 
 
 def masking_video(path_video: str,
-                  path_masked_video: str,
                   frame_size: tuple,
-                  frame_rate: int,
                   coord: list) -> None:
     """
     Function for masking and saving video
     :param path_video: path to video
-    :param path_masked_video: out path
     :param frame_size: frame size
-    :param frame_rate: frame rate
     :param coord: coordinates of mask [(x1, y1), (x2, y2)...]
     :return: None
     """
+    for i in range(len(coord)):
+        coord[i] = tuple(coord[i])
     mask = video_processing.create_mask(frame_size, coord)
     frames = video_processing.video_to_array_optimizing(path_video, frame_size, 3)
     mask_frames = video_processing.apply_mask(frames, mask)
-
-    video_processing.array_to_video(mask_frames,
-                                    path_masked_video,
-                                    'mp4v',
-                                    frame_rate,
-                                    frame_size)
     gc.collect()
     clear_output()
+    return mask_frames
 
 
+def worker():
+    with open(os.path.join(Path(__file__).parents[0], 'config', 'model.yaml')) as file:
+        config = yaml.load(file, Loader=yaml.Loader)
+    masked_frames = masking_video(path_video=config['constants']['path_video'],
+                                  frame_size=tuple(config['constants']['frame_size']),
+                                  coord=config['constants']['coord'])
+
+    for frame in masked_frames:
+        detection = car_detection(frame)
+        if detection == 'car' or detection == 'truck':
+            moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
+            # TODO красивый вывод в лог
+            log.info(f'{detection.upper()} detected, start recording')
+            # TODO start saving video
+            # делать через out и просто write фрэймов
+            coord = plat_detection(frame)
+            # TODO: coord crop
+            recognized_code = ocr_recognition()
+            log.info(f'Car - {recognized_code[:5]}')
+            with open(config['constant']['path_enter_car']) as file:
+                cars = file.readlines()
+            if recognized_code not in cars:
+                print('ALARM: CHECK CAR!!!!!!')
+            else:
+                log.info(f'Car - {recognized_code[:5]} - in passed')
 def crop_image(image: np.array, coord: list) -> np.array:
     """
     Function for crop the image
@@ -114,10 +139,14 @@ def crop_image(image: np.array, coord: list) -> np.array:
 
 
 def main_loop(video):
-    # mask_video = 
-    # TODO: add mask on video 
+    # mask_video =
+    # TODO: add mask on video
     detection = car_detection(video)
     if detection == 'car' or detection == 'truck':
         moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
         log.info(f'{detection.upper()} detected, start recording')
         # TODO start saving video
+
+
+if __name__ == '__main__':
+    worker()
