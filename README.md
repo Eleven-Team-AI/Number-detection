@@ -17,6 +17,6 @@ constants:
   path_video: path for your video
   frame_size: [2258,1244]
   frame_rate: 20
-  coord: [[0,0], [0,1], [1,0], [1,1]]
-  path_enter_car: './Enter_system/src/enter_car.txt'
+  coord: [[0,0], [0,1], [1,0], [1,1]] 
+  path_enter_car: path for cars for enter system
 ```
