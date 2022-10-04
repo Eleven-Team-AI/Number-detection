@@ -60,7 +60,7 @@ def ocr_recognition(path: str) -> str:
     """
     data = easyocr.Reader(['ru'], gpu=False)
     text = data.readtext(process_image(path))
-    text = re.sub(r"[' :;~=+)()]", '', text[0][1]).lower()
+    text = re.sub(r"[' :;~=+)()-]", '', text[0][1]).lower()
 
     return text
 
