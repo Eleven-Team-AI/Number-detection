@@ -40,7 +40,7 @@ def car_detection(frame):
 
 def plat_detection(frame):
     results = plat_yolo_model(frame)
-    labels, cord_thres = results.pred[0][:, -1].cpu().numpy(), results.xyxyn[0][:, :-1].cpu().numpy()
+    labels, cord_thres = results.xyxy[0][:, -1].cpu().numpy(), results.xyxy[0][:, :-1].cpu().numpy()
     names = plat_yolo_model.names
     detected = '-'
     for label in labels:
