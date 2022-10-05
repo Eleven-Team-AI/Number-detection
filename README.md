@@ -11,7 +11,7 @@ git clone https://github.com/Eleven-Team-AI/Number-detection  # clone
 cd Number-detection
 pip install -r requirements.txt  # install
 ```
-Add video for detection and change path in [model.yaml][https://github.com/Eleven-Team-AI/Number-detection/blob/main/Enter_system/config/model.yaml]
+Add video for detection and change path in [model.yaml](https://github.com/Eleven-Team-AI/Number-detection/blob/main/Enter_system/config/model.yaml)
 ```yaml
 constants:
   path_video: path for your video
@@ -25,5 +25,5 @@ Start module
 python3 -m Enter_system
 ```
 ## Models
-2 models were selected for OCR: [easyocr][https://github.com/jaidedai/easyocr] and [MORAN][https://github.com/Canjie-Luo/MORAN_v2]. The final choice was made in favor of easyocr as showing the best results in conditions of low image quality.
+2 models were selected for OCR: [easyocr](https://github.com/jaidedai/easyocr) and [MORAN](https://github.com/Canjie-Luo/MORAN_v2). The final choice was made in favor of easyocr as showing the best results in conditions of low image quality.
 ## Metrics
