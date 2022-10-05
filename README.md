@@ -25,4 +25,5 @@ Start module
 python3 -m Enter_system
 ```
 ## Models
+2 models were selected for OCR: easyocr and MORAN. The final choice was made in favor of easyocr as showing the best results in conditions of low image quality.
 ## Metrics
