@@ -11,7 +11,7 @@ git clone https://github.com/Eleven-Team-AI/Number-detection  # clone
 cd Number-detection
 pip install -r requirements.txt  # install
 ```
-Add video for detection and change path in [model.yaml][https://github.com/Eleven-Team-AI/Number-detection/blob/main/Enter_system/config/model.yaml]
+Add video for detection and change path in [model.yaml](https://github.com/Eleven-Team-AI/Number-detection/blob/main/Enter_system/config/model.yaml)
 ```yaml
 constants:
   path_video: path for your video
@@ -24,11 +24,33 @@ Start module
 ```bash
 python3 -m Enter_system
 ```
+If car in list of cars for enter
+```bash
+MSK: 2022-10-05 16:12:06.988677+03:00 - CAR detected - start recording
+MSK: 2022-10-05 16:12:06.988677+03:00 - CAR detected - wait code detected
+MSK: 2022-10-05 16:12:09.783503+03:00 - CAR detected - start recording
+MSK: 2022-10-05 16:12:09.783503+03:00 - CAR detected - wait code detected
+MSK: 2022-10-05 16:12:10.441639+03:00 - CAR detected - start recording
+MSK: 2022-10-05 16:12:10.441639+03:00 - CAR detected - code - 0841С
+MSK: 2022-10-05 16:12:10.441639+03:00 - CAR detected - 0841С - passed
+MSK: 2022-10-05 16:12:10.441639+03:00 - CAR detected - 0841С - passed
+```
+If car not in list cars for enter
+```bash
+MSK: 2022-10-05 16:12:06.988677+03:00 - CAR detected - start recording
+MSK: 2022-10-05 16:12:06.988677+03:00 - CAR detected - wait code detected
+MSK: 2022-10-05 16:12:09.783503+03:00 - CAR detected - start recording
+MSK: 2022-10-05 16:12:09.783503+03:00 - CAR detected - wait code detected
+MSK: 2022-10-05 16:12:10.441639+03:00 - CAR detected - start recording
+MSK: 2022-10-05 16:12:10.441639+03:00 - CAR detected - code - 0841С
+ALARM: CHECK CAR!!!!!!
+```
 ## Models
-Car detection  - [yolov5](https://github.com/ultralytics/yolov5). Plate detection - finetuned yolov5 on [Detecsi Plat NomorDataset](https://universe.roboflow.com/elektronika-instrumentasi-fisika-its/deteksi-plat-nomor/browse?queryText=&pageSize=50&startingIndex=0&browseQuery=true).
+Car detection  - [yolov5](https://github.com/ultralytics/yolov5). 
 
-2 models were selected for OCR: easyocr and MORAN. The final choice was made in favor of easyocr as showing the 
-best results in conditions of low image quality. Google Colab with OCR Model - [link](https://colab.research.google.com/drive/1ku7odTkO3LLpZvePPQNsztXPt0DUGyEE#scrollTo=rDZmjjiwH5FA).
+Plate detection - finetuned yolov5 on [Detecsi Plat NomorDataset](https://universe.roboflow.com/elektronika-instrumentasi-fisika-its/deteksi-plat-nomor/browse?queryText=&pageSize=50&startingIndex=0&browseQuery=true).
+
+2 models were selected for OCR: [easyocr](https://github.com/jaidedai/easyocr) and [MORAN](https://github.com/Canjie-Luo/MORAN_v2). The final choice was made in favor of easyocr as showing the best results in conditions of low image quality.
 
 Easyocr output example:
 ![image](images/easyocr.png)
