@@ -81,6 +81,7 @@ For experiments, we used Yolov5 nano.
 | 100    |     0.01      |   SGD |   0.922 |
 | 100    |     0.001     |  Adam |   0.925 |
 | 150    |     0.01      | AdamW |   0.929 |
+
 We finetune this model with commad:
 ```bash
 python train.py --img 640 --batch 32 --epochs 150 --data number_detection/data.yaml --weights yolov5n.pt --name num_detect_AdamW --optimizer AdamW 
