@@ -25,6 +25,7 @@ plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom',
                                  path=os.path.join(Path(__file__).parents[0],
                                                    'models', 'plat_model'),
                                  force_reload=True)
+ocr_model = easyocr.Reader(['ru'], gpu=False)
 
 
 def car_detection(frame: np.array) -> str:
@@ -79,14 +80,14 @@ def process_image(image: np.array) -> np.array:
     return invert
 
 
-def ocr_recognition(image: np.array) -> str:
+def ocr_recognition(model, image: np.array) -> str:
     """
     Function for OCR text from picture
     :param image: image as np.array
     :return: recognized text
     """
-    data = easyocr.Reader(['ru'], gpu=False)
-    text = data.readtext(image)
+    # data = easyocr.Reader(['ru'], gpu=False)
+    text = model.readtext(image)
     text = re.sub(r"[' :;~=+)()-]", '', text[0][1]).lower()
 
     return text
@@ -118,7 +119,7 @@ def crop_image(image: np.array, coord: list) -> np.array:
     :return: np.array
     """
     img = Image.fromarray(image)
-    img_crop = img.crop(coord[0], coord[1], coord[2], coord[3])
+    img_crop = img.crop((coord[0], coord[1], coord[2], coord[3]))
 
     return np.array(img_crop)
 
@@ -138,15 +139,16 @@ def worker():
         # im = video_processing.create_mask(im.shape[1:], coord)
         detection = car_detection(im)
         if detection == 'car' or detection == 'truck':
-            print('detect car')
             moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
             # TODO красивый вывод в лог
             log.info(f'{detection.upper()} detected, start recording')
             # TODO start saving video
             # делать через out и просто write фрэймов
             coord = plat_detection(im)
+            cropped_image = crop_image(im, coord)
+
             # TODO: coord crop
-            recognized_code = ocr_recognition(im)
+            recognized_code = ocr_recognition(ocr_model, cropped_image)
             log.info(f'Car - {recognized_code[:5]}')
             with open(config['constant']['path_enter_car']) as file:
                 cars = file.readlines()
