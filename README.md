@@ -53,12 +53,12 @@ Plate detection - finetuned yolov5 on [Detecsi Plat NomorDataset](https://univer
 2 models were selected for OCR: [easyocr](https://github.com/jaidedai/easyocr) and [MORAN](https://github.com/Canjie-Luo/MORAN_v2). The final choice was made in favor of easyocr as showing the best results in conditions of low image quality.
 
 Easyocr output example:
-![image](<img width="470" alt="Снимок экрана 2022-10-05 в 18 22 46" src="https://user-images.githubusercontent.com/55249362/194071378-6aeb6286-db26-4f15-aa70-2e0e86a08410.png">)
+![image] <img width="470" alt="Снимок экрана 2022-10-05 в 18 22 46" src="https://user-images.githubusercontent.com/55249362/194071378-6aeb6286-db26-4f15-aa70-2e0e86a08410.png">
 
 
 
 MORAN output example:
-![MORAN](<img width="470" alt="Снимок экрана 2022-10-05 в 18 23 50" src="https://user-images.githubusercontent.com/55249362/194071402-63d2aa2c-d4e5-4008-9d9f-d87bbade6880.png">)
+![MORAN] <img width="470" alt="Снимок экрана 2022-10-05 в 18 23 50" src="https://user-images.githubusercontent.com/55249362/194071402-63d2aa2c-d4e5-4008-9d9f-d87bbade6880.png">
 
 
 ## Metrics
