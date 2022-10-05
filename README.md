@@ -53,18 +53,20 @@ Plate detection - finetuned yolov5 on [Detecsi Plat NomorDataset](https://univer
 2 models were selected for OCR: [easyocr](https://github.com/jaidedai/easyocr) and [MORAN](https://github.com/Canjie-Luo/MORAN_v2). The final choice was made in favor of easyocr as showing the best results in conditions of low image quality.
 
 Easyocr output example:
-![image](images/easyocr.png)<img width="470" alt="Снимок экрана 2022-10-05 в 18 22 46" src="https://user-images.githubusercontent.com/55249362/194070286-e5fbd065-71fa-4f6e-bb16-b60096485fa1.png">
+![image](<img width="470" alt="Снимок экрана 2022-10-05 в 18 22 46" src="https://user-images.githubusercontent.com/55249362/194070286-e5fbd065-71fa-4f6e-bb16-b60096485fa1.png">)
 
 
 MORAN output example:
-![MORAN](images/moran.png)
+![MORAN](<img width="470" alt="Снимок экрана 2022-10-05 в 18 23 50" src="https://user-images.githubusercontent.com/55249362/194070443-5c9a8f88-003d-4848-9496-bf71e74912b2.png">)
+
 
 ## Metrics
 | model  |          task          | value |   metric |
 |--------|:----------------------:|------:|---------:|
 | yolov5 | number plate detection | 0.929 |  mAP 0.5 |
 | yolov5 |     car detection      |  45.7 |  mAP 0.5 |
-| moran  |          OCR           |  64.3 | Accuracy |
+| easyocr|          OCR           |  93.  | Accuracy |
+| MORAN  |          OCR           |  93.  | Accuracy |
 
 
 ## Selection of hyperparameters for plat detection model
