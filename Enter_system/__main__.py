@@ -104,11 +104,11 @@ def crop_image(image: np.array, coord: list) -> np.array:
     """
     Function for crop the image
     :param image: image as np.array
-    :param coord: tuple
+    :param coord: list
     :return: np.array
     """
     img = Image.fromarray(image)
-    img_crop = img.crop(coord)
+    img_crop = img.crop(coord[0], coord[1], coord[2], coord[3])
 
     return np.array(img_crop)
 
