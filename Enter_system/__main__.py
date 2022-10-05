@@ -1,26 +1,29 @@
-from unicodedata import name
-import torch
+import gc
 import logging
-from . import video_processing
+import os
+import re
 from datetime import datetime
-import pytz
-import numpy as np
+from pathlib import Path
+
 import cv2
 import easyocr
-import re
-import gc
+import numpy as np
+import pytz
+import torch
+import yaml
 from IPython.core.display import clear_output
 from PIL import Image
-import yaml
-import os
-from pathlib import Path
+
+import video_processing
+from yolov5.utils.dataloaders import LoadImages
+from yolov5.utils.general import check_file
 
 log = logging.getLogger('enter_system')
 
 yolo_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom', 
-                                 path=os.path.join(Path(__file__).parents[0], 
-                                                   'models', 'plat_model'), 
+plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom',
+                                 path=os.path.join(Path(__file__).parents[0],
+                                                   'models', 'plat_model'),
                                  force_reload=True)
 
 
@@ -31,14 +34,12 @@ def car_detection(frame: np.array) -> str:
     :return: yolo_model.names
     """
     results = yolo_model(frame)
-    labels = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
+    detections = results.pred[0][:, 5].unique()
+    labels = detections.cpu().numpy()
     names = yolo_model.names
     detected = '-'
-
     for label in labels:
-        # TODO check label
         detected = names[label]
-
     return detected
 
 
@@ -49,16 +50,13 @@ def plat_detection(frame: np.array) -> list:
     :return: coord of plate number
     """
     results = plat_yolo_model(frame)
-    labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
+    labels, cord_thres = results.xyxy[0][:, -1].cpu().numpy(), results.xyxy[0][:, :-1].cpu().numpy()
     names = plat_yolo_model.names
     detected = '-'
-
     for label in labels:
-        # TODO check label
         detected = names[label]
         if detected == 'plat-nomor':
             return cord_thres
-
     return None
 
 
@@ -96,7 +94,7 @@ def ocr_recognition(image: np.array) -> str:
 
 def masking_video(path_video: str,
                   frame_size: tuple,
-                  coord: list) -> np.array():
+                  coord: list) -> np.array:
     """
     Function for masking and saving video
     :param path_video: path to video
@@ -128,44 +126,34 @@ def crop_image(image: np.array, coord: list) -> np.array:
 def worker():
     with open(os.path.join(Path(__file__).parents[0], 'config', 'model.yaml')) as file:
         config = yaml.load(file, Loader=yaml.Loader)
+    #TODO: пофиксить парсинг координат, они парсятся  с разделителем запятая внутри тюпла
+    # masked_frames = masking_video(path_video=config['constants']['path_video'],
+    #                               frame_size=tuple(config['constants']['frame_size']),
+    #                               coord=config['constants']['coord_for_mask'])
+    coord = [[0, 0], [0, 330], [1920, 330], [1920, 0]]
+    source = check_file('/second_4tb/kuchuganova/other/Number-detection/Enter_system/src/record.mp4')
+    dataset = LoadImages(source, img_size=(640, 640), stride=yolo_model.stride, auto=yolo_model.pt, vid_stride=1)
 
-    masked_frames = masking_video(path_video=config['constants']['path_video'],
-                                  frame_size=tuple(config['constants']['frame_size']),
-                                  coord=config['constants']['coord_for_mask'])
-
-    for frame in masked_frames:
-        detection = car_detection(frame)
+    for path, im, im0s, vid_cap, s in dataset:
+        # im = video_processing.create_mask(im.shape[1:], coord)
+        detection = car_detection(im)
         if detection == 'car' or detection == 'truck':
+            print('detect car')
             moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
             # TODO красивый вывод в лог
             log.info(f'{detection.upper()} detected, start recording')
             # TODO start saving video
             # делать через out и просто write фрэймов
-            coord = plat_detection(frame)
-
-            # crop, process and recognizing plate number
-            crop = crop_image(frame, coord)
-            processed_crop = process_image(crop)
-            recognized_code = ocr_recognition(processed_crop)
+            coord = plat_detection(im)
+            # TODO: coord crop
+            recognized_code = ocr_recognition(im)
             log.info(f'Car - {recognized_code[:5]}')
-
             with open(config['constant']['path_enter_car']) as file:
                 cars = file.readlines()
             if recognized_code not in cars:
                 print('ALARM: CHECK CAR!!!!!!')
             else:
                 log.info(f'Car - {recognized_code[:5]} - in passed')
-
-
-
-def main_loop(video):
-    # mask_video =
-    # TODO: add mask on video
-    detection = car_detection(video)
-    if detection == 'car' or detection == 'truck':
-        moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
-        log.info(f'{detection.upper()} detected, start recording')
-        # TODO start saving video
 
 
 if __name__ == '__main__':

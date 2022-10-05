@@ -189,6 +189,7 @@ def create_mask(shape_image: tuple, coord_point_list: list):
     :param coord_point_list: list tuples of coord. Ex: [(x1,y1),(x2,y2)...]
     :return: mask array
     """
+    coord_point_list = [tuple(elem) for elem in coord_point_list]
     img = Image.new('L', shape_image, color=255)
     transparent_a = (0, 0, shape_image[0], shape_image[1])
     draw = ImageDraw.Draw(img, mode='L')
