@@ -1,6 +1,6 @@
 constants:
   path_video: './Enter_system/src/record.mp4'
-  frame_size: [2258,1244]
+  frame_size: [1920, 1080]
   frame_rate: 20
-  coord: [[0,0], [0,1], [1,0], [1,1]]
+  coord: [[0,0], [0,330], [1920,330], [1920,0]]
   path_enter_car: './Enter_system/src/enter_car.txt'

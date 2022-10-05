@@ -10,6 +10,7 @@ import easyocr
 import re
 import gc
 from IPython.core.display import clear_output
+from PIL import Image
 import yaml
 import os
 from pathlib import Path
@@ -23,37 +24,50 @@ plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom',
                                  force_reload=True)
 
 
-def car_detection(frame):
+def car_detection(frame: np.array) -> str:
+    """
+    Function for detection car on frame
+    :param frame: frane as np.array
+    :return: yolo_model.names
+    """
     results = yolo_model(frame)
     labels = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
     names = yolo_model.names
     detected = '-'
+
     for label in labels:
         # TODO check label
         detected = names[label]
+
     return detected
 
 
-def plat_detection(frame):
+def plat_detection(frame: np.array) -> list:
+    """
+    Functions for detect plate number
+    :param frame: frame as np.array
+    :return: coord of plate number
+    """
     results = plat_yolo_model(frame)
     labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
     names = plat_yolo_model.names
     detected = '-'
+
     for label in labels:
         # TODO check label
         detected = names[label]
         if detected == 'plat-nomor':
             return cord_thres
+
     return None
 
 
-def process_image(path: str) -> np.array:
+def process_image(image: np.array) -> np.array:
     """
     Function for preprocessing image for OCR recognition
-    :param path: path to image
+    :param image: image as np.array
     :return: numpy array
     """
-    image = cv2.imread(path)
     image = cv2.resize(image, (0, 0), fx=3, fy=3)
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -67,14 +81,14 @@ def process_image(path: str) -> np.array:
     return invert
 
 
-def ocr_recognition(path: str) -> str:
+def ocr_recognition(image: np.array) -> str:
     """
     Function for OCR text from picture
-    :param path: image path
+    :param image: image as np.array
     :return: recognized text
     """
     data = easyocr.Reader(['ru'], gpu=False)
-    text = data.readtext(process_image(path))
+    text = data.readtext(image)
     text = re.sub(r"[' :;~=+)()-]", '', text[0][1]).lower()
 
     return text
@@ -82,7 +96,7 @@ def ocr_recognition(path: str) -> str:
 
 def masking_video(path_video: str,
                   frame_size: tuple,
-                  coord: list) -> None:
+                  coord: list) -> np.array():
     """
     Function for masking and saving video
     :param path_video: path to video
@@ -97,8 +111,6 @@ def masking_video(path_video: str,
     mask_frames = video_processing.apply_mask(frames, mask)
     gc.collect()
     clear_output()
-    return mask_frames
-
 
 def worker():
     with open(os.path.join(Path(__file__).parents[0], 'config', 'model.yaml')) as file:
