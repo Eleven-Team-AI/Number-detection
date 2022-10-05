@@ -4,7 +4,6 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
-
 import cv2
 import easyocr
 import numpy as np
@@ -13,10 +12,7 @@ import torch
 import yaml
 from IPython.core.display import clear_output
 from PIL import Image
-
-import video_processing
-from yolov5.utils.dataloaders import LoadImages
-from yolov5.utils.general import check_file
+from . import video_processing
 
 log = logging.getLogger('enter_system')
 
@@ -26,7 +22,6 @@ plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom',
                                                    'models', 'plat_model'),
                                  force_reload=True)
 ocr_model = easyocr.Reader(['ru'], gpu=False)
-
 
 def car_detection(frame: np.array) -> str:
     """
@@ -42,7 +37,7 @@ def car_detection(frame: np.array) -> str:
 
     for label in labels:
         detected = names[label]
-
+        
     return detected
 
 
@@ -59,8 +54,8 @@ def plat_detection(frame: np.array) -> list:
     for label in labels:
         detected = names[label]
         if detected == 'plat-nomor':
-            return cord_thres
-    return None
+            return cord_thres[0]
+    return []
 
 
 def process_image(image: np.array) -> np.array:
@@ -106,10 +101,11 @@ def masking_video(path_video: str,
     :return: None
     """
     mask = video_processing.create_mask(frame_size, coord)
-    frames = video_processing.video_to_array_optimizing(path_video, frame_size, 3)
+    frames = video_processing.video_to_array_optimizing(path_video, frame_size, 3)    
     mask_frames = video_processing.apply_mask(frames, mask)
     gc.collect()
     clear_output()
+    return frames
 
 def crop_image(image: np.array, coord: list) -> np.array:
     """
@@ -138,38 +134,45 @@ def crop_image(image: np.array, coord: list) -> np.array:
 
 
 def worker():
+    GATE_IS_OPEN = False
+
     with open(os.path.join(Path(__file__).parents[0], 'config', 'model.yaml')) as file:
         config = yaml.load(file, Loader=yaml.Loader)
-    #TODO: пофиксить парсинг координат, они парсятся  с разделителем запятая внутри тюпла
-    # masked_frames = masking_video(path_video=config['constants']['path_video'],
-    #                               frame_size=tuple(config['constants']['frame_size']),
-    #                               coord=config['constants']['coord_for_mask'])
-    coord = [[0, 0], [0, 330], [1920, 330], [1920, 0]]
-    source = check_file('/second_4tb/kuchuganova/other/Number-detection/Enter_system/src/record.mp4')
-    dataset = LoadImages(source, img_size=(640, 640), stride=yolo_model.stride, auto=yolo_model.pt, vid_stride=1)
 
-    for path, im, im0s, vid_cap, s in dataset:
-        # im = video_processing.create_mask(im.shape[1:], coord)
-        detection = car_detection(im)
-        if detection == 'car' or detection == 'truck':
-            moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
-            # TODO красивый вывод в лог
-            log.info(f'{detection.upper()} detected, start recording')
-            # TODO start saving video
-            # делать через out и просто write фрэймов
-            coord = plat_detection(im)
-            cropped_image = crop_image(im, coord)
+    config['constants']['coord'] = [tuple(elem) for elem in config['constants']['coord']]
+    masked_frames = masking_video(path_video=config['constants']['path_video'],
+                                  frame_size=tuple(config['constants']['frame_size']),
+                                  coord=config['constants']['coord'])
 
-            # TODO: coord crop
-            recognized_code = ocr_recognition(ocr_model, cropped_image)
-            log.info(f'Car - {recognized_code[:5]}')
-            with open(config['constant']['path_enter_car']) as file:
-                cars = file.readlines()
-            if recognized_code not in cars:
-                print('ALARM: CHECK CAR!!!!!!')
-            else:
-                log.info(f'Car - {recognized_code[:5]} - in passed')
+    for im in masked_frames:
+        # start_time = datetime.now()
+        if not GATE_IS_OPEN:
+            detection = car_detection(im)
+            if detection == 'car' or detection == 'truck':
+                moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
+                log.info(f'MSK: {moscow_time} - {detection.upper()} detected - start recording')
+                coord = plat_detection(im)
+                if coord != []:
+                    cropped_image = crop_image(im, coord)
+                    recognized_code = ocr_recognition(ocr_model, cropped_image).upper()
 
+                    log.info(f'MSK: {moscow_time} - {detection.upper()} detected - code - {recognized_code[:5]}')
+                    
+                    with open(config['constants']['path_enter_car']) as file:
+                        cars = file.readlines()
+                    
+                    cars = [elem.replace('\n', '') for elem in cars]
+                    # print(datetime.now() - start_time)
+                    if recognized_code not in cars:
+                        GATE_IS_OPEN = False
+                        print('ALARM: CHECK CAR!!!!!!')
+                    else:
+                        GATE_IS_OPEN = not GATE_IS_OPEN
+                        log.info(f'MSK: {moscow_time} - {detection.upper()} detected - {recognized_code[:5]} - passed')
+                        print(f'MSK: {moscow_time} - {detection.upper()} detected - {recognized_code[:5]} - passed')
+                else:
+                    log.info(f'MSK: {moscow_time} - {detection.upper()} detected - wait code detected')
+    GATE_IS_OPEN = False
 
 if __name__ == '__main__':
     worker()
