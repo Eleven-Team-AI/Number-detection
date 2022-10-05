@@ -14,6 +14,8 @@ import yaml
 from IPython.core.display import clear_output
 
 import video_processing
+from yolov5.utils.dataloaders import LoadImages
+from yolov5.utils.general import check_file
 
 log = logging.getLogger('enter_system')
 
@@ -26,7 +28,8 @@ plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom',
 
 def car_detection(frame):
     results = yolo_model(frame)
-    labels = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
+    detections = results.pred[0][:, 5].unique()
+    labels = detections.cpu().numpy()
     names = yolo_model.names
     detected = '-'
     for label in labels:
@@ -37,7 +40,7 @@ def car_detection(frame):
 
 def plat_detection(frame):
     results = plat_yolo_model(frame)
-    labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
+    labels, cord_thres = results.pred[0][:, -1].cpu().numpy(), results.xyxyn[0][:, :-1].cpu().numpy()
     names = plat_yolo_model.names
     detected = '-'
     for label in labels:
@@ -104,19 +107,22 @@ def masking_video(path_video: str,
 def worker():
     with open(os.path.join(Path(__file__).parents[0], 'config', 'model.yaml')) as file:
         config = yaml.load(file, Loader=yaml.Loader)
-    masked_frames = masking_video(path_video=config['constants']['path_video'],
-                                  frame_size=tuple(config['constants']['frame_size']),
-                                  coord=config['constants']['coord'])
+    # masked_frames = masking_video(path_video=config['constants']['path_video'],
+    #                               frame_size=tuple(config['constants']['frame_size']),
+    #                               coord=config['constants']['coord'])
+    source = check_file('/second_4tb/kuchuganova/other/Number-detection/Enter_system/src/record.mp4')
+    masked_frames = LoadImages(source, img_size=(640, 640), stride=yolo_model.stride, auto=yolo_model.pt, vid_stride=1)
 
-    for frame in masked_frames:
-        detection = car_detection(frame)
+    for path, im, im0s, vid_cap, s in masked_frames:
+        detection = car_detection(im)
         if detection == 'car' or detection == 'truck':
+            print('detect car')
             moscow_time = datetime.now(pytz.timezone('Europe/Moscow'))
             # TODO красивый вывод в лог
             log.info(f'{detection.upper()} detected, start recording')
             # TODO start saving video
             # делать через out и просто write фрэймов
-            coord = plat_detection(frame)
+            coord = plat_detection(im)
             # TODO: coord crop
             recognized_code = ocr_recognition()
             log.info(f'Car - {recognized_code[:5]}')
