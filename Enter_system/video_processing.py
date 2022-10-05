@@ -1,10 +1,12 @@
-import os.path
-import cv2
 import glob
-from typing import MutableSequence
-import numpy as np
-from PIL import Image, ImageDraw
+import os.path
 import time
+from typing import MutableSequence
+
+import cv2
+import numpy as np
+from PIL import Image
+from PIL import ImageDraw
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 

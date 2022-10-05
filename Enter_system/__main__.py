@@ -1,25 +1,26 @@
-from unicodedata import name
-import torch
+import gc
 import logging
-from . import video_processing
+import os
+import re
 from datetime import datetime
-import pytz
-import numpy as np
+from pathlib import Path
+
 import cv2
 import easyocr
-import re
-import gc
-from IPython.core.display import clear_output
+import numpy as np
+import pytz
+import torch
 import yaml
-import os
-from pathlib import Path
+from IPython.core.display import clear_output
+
+import video_processing
 
 log = logging.getLogger('enter_system')
 
 yolo_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom', 
-                                 path=os.path.join(Path(__file__).parents[0], 
-                                                   'models', 'plat_model'), 
+plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom',
+                                 path=os.path.join(Path(__file__).parents[0],
+                                                   'models', 'plat_model'),
                                  force_reload=True)
 
 
@@ -103,7 +104,7 @@ def masking_video(path_video: str,
 def worker():
     with open(os.path.join(Path(__file__).parents[0], 'config', 'model.yaml')) as file:
         config = yaml.load(file, Loader=yaml.Loader)
-    masked_frames = masking_video(path_video=config['constants']['path_video'], 
+    masked_frames = masking_video(path_video=config['constants']['path_video'],
                                   frame_size=tuple(config['constants']['frame_size']),
                                   coord=config['constants']['coord'])
 

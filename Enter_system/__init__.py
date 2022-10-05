@@ -1,6 +1,7 @@
+import logging.config
 import os.path
+import yaml
 from pathlib import Path
-import logging, logging.config, yaml
 
 logging.config.dictConfig(
     yaml.load(
