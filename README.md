@@ -11,7 +11,7 @@ git clone https://github.com/Eleven-Team-AI/Number-detection  # clone
 cd Number-detection
 pip install -r requirements.txt  # install
 ```
-Add video for detection and change path in [model.yaml](https://github.com/Eleven-Team-AI/Number-detection/blob/main/Enter_system/config/model.yaml)
+Add video for detection and change path in [model.yaml][https://github.com/Eleven-Team-AI/Number-detection/blob/main/Enter_system/config/model.yaml]
 ```yaml
 constants:
   path_video: path for your video
@@ -25,17 +25,27 @@ Start module
 python3 -m Enter_system
 ```
 ## Models
-Car detection  - YoloV5.
-Number plate detection - finetuned yolov5 on [ Detecsi Plat Nomor Dataset](https://universe.roboflow.com/elektronika-instrumentasi-fisika-its/deteksi-plat-nomor/browse?queryText=&pageSize=50&startingIndex=0&browseQuery=true).
+Car detection  - [yolov5](https://github.com/ultralytics/yolov5). Plate detection - finetuned yolov5 on [Detecsi Plat NomorDataset](https://universe.roboflow.com/elektronika-instrumentasi-fisika-its/deteksi-plat-nomor/browse?queryText=&pageSize=50&startingIndex=0&browseQuery=true).
 
-2 models were selected for OCR: [easyocr](https://github.com/jaidedai/easyocr) and [MORAN](https://github.com/Canjie-Luo/MORAN_v2). The final choice was made in favor of easyocr as showing the best results in conditions of low image quality.
+2 models were selected for OCR: easyocr and MORAN. The final choice was made in favor of easyocr as showing the 
+best results in conditions of low image quality. Google Colab with OCR Model - [link](https://colab.research.google.com/drive/1ku7odTkO3LLpZvePPQNsztXPt0DUGyEE#scrollTo=rDZmjjiwH5FA).
+
+Easyocr output example:
+![image](images/easyocr.png)
+
+MORAN output example:
+![MORAN](images/moran.png)
+
 ## Metrics
-| model  |          task          | value |  metric |
-|--------|:----------------------:|------:|--------:|
-| yolov5 | number plate detection | 0.929 | mAP 0.5 |
-| yolov5 |     car detection      |  45.7 | mAP 0.5 |
-|     |          OCR           |  |         |
+| model  |          task          | value |   metric |
+|--------|:----------------------:|------:|---------:|
+| yolov5 | number plate detection | 0.929 |  mAP 0.5 |
+| yolov5 |     car detection      |  45.7 |  mAP 0.5 |
+| moran  |          OCR           |  64.3 | Accuracy |
+
+
 ## Selection of hyperparameters for plat detection model
+
 For experiments, we used Yolov5 nano.
 
 | Epochs | learning rate |   opt | mAP 0.5 |
@@ -43,4 +53,8 @@ For experiments, we used Yolov5 nano.
 | 100    |     0.01      |   SGD |   0.922 |
 | 100    |     0.001     |  Adam |   0.925 |
 | 150    |     0.01      | AdamW |   0.929 |
+We finetune this model with commad:
+```bash
+python train.py --img 640 --batch 32 --epochs 150 --data number_detection/data.yaml --weights yolov5n.pt --name num_detect_AdamW --optimizer AdamW 
+```
 
