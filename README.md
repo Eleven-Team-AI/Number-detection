@@ -1,4 +1,4 @@
-# Number-detection
+ # Number-detection
 Education project for master program Machine Learning Engineering by ITMO & AI Talent HUB.
 Team: Voronkina Daria, Zhukov Dmitriy, Kuchuganova Svetlana
 ## Quick start examples
@@ -63,7 +63,7 @@ MORAN output example:
 <img width="470" alt="Снимок экрана 2022-10-05 в 18 23 50" src="https://user-images.githubusercontent.com/55249362/194071402-63d2aa2c-d4e5-4008-9d9f-d87bbade6880.png">
 
 
-## Metrics
+## Metrics and models comparison
 | model  |          task          | value |   metric |
 |--------|:----------------------:|------:|---------:|
 | yolov5 | number plate detection | 0.929 |  mAP 0.5 |
@@ -74,7 +74,7 @@ MORAN output example:
 
 ## Selection of hyperparameters for plat detection model
 
-For experiments, we used Yolov5 nano.
+For experiments, we used Yolov5 nano. Image size is 640x640.
 
 | Epochs | learning rate |   opt | mAP 0.5 |
 |--------|:-------------:|------:|--------:|
@@ -86,4 +86,10 @@ We finetune this model with commad:
 ```bash
 python train.py --img 640 --batch 32 --epochs 150 --data number_detection/data.yaml --weights yolov5n.pt --name num_detect_AdamW --optimizer AdamW 
 ```
+## Model performance
+Time to process 1 frame is 0:00:00.648164.
+
+The solution easy can be scaled to many cameras by Yolo utils.
+
+Solution can be reproduced on CPU.
 

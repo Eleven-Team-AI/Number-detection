@@ -182,7 +182,7 @@ def array_to_video(x: MutableSequence,
     print("Program time array_to_video: {:>.3f}".format(finish) + " seconds.")
 
 
-def create_mask(shape_image: tuple, coord_point_list: list):
+def create_mask(shape_image: tuple, coord_point_list: list) -> np.array:
     """
     Function for creating mask array for frame
     :param shape_image: size of frame

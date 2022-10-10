@@ -4,6 +4,7 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
+
 import cv2
 import easyocr
 import numpy as np
@@ -12,7 +13,7 @@ import torch
 import yaml
 from IPython.core.display import clear_output
 from PIL import Image
-from . import video_processing
+import video_processing
 
 log = logging.getLogger('enter_system')
 
@@ -22,6 +23,7 @@ plat_yolo_model = torch.hub.load('ultralytics/yolov5', 'custom',
                                                    'models', 'plat_model'),
                                  force_reload=True)
 ocr_model = easyocr.Reader(['ru'], gpu=False)
+
 
 def car_detection(frame: np.array) -> str:
     """
@@ -37,7 +39,7 @@ def car_detection(frame: np.array) -> str:
 
     for label in labels:
         detected = names[label]
-        
+
     return detected
 
 
@@ -101,11 +103,12 @@ def masking_video(path_video: str,
     :return: None
     """
     mask = video_processing.create_mask(frame_size, coord)
-    frames = video_processing.video_to_array_optimizing(path_video, frame_size, 3)    
+    frames = video_processing.video_to_array_optimizing(path_video, frame_size, 3)
     mask_frames = video_processing.apply_mask(frames, mask)
     gc.collect()
     clear_output()
     return frames
+
 
 def crop_image(image: np.array, coord: list) -> np.array:
     """
@@ -157,10 +160,10 @@ def worker():
                     recognized_code = ocr_recognition(ocr_model, cropped_image).upper()
 
                     log.info(f'MSK: {moscow_time} - {detection.upper()} detected - code - {recognized_code[:5]}')
-                    
+
                     with open(config['constants']['path_enter_car']) as file:
                         cars = file.readlines()
-                    
+
                     cars = [elem.replace('\n', '') for elem in cars]
                     # print(datetime.now() - start_time)
                     if recognized_code not in cars:
@@ -173,6 +176,7 @@ def worker():
                 else:
                     log.info(f'MSK: {moscow_time} - {detection.upper()} detected - wait code detected')
     GATE_IS_OPEN = False
+
 
 if __name__ == '__main__':
     worker()
