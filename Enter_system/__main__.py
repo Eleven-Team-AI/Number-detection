@@ -1,19 +1,19 @@
-import gc
-import logging
-import os
-import re
-from datetime import datetime
-from pathlib import Path
-
 import cv2
 import easyocr
+import gc
+import logging
 import numpy as np
+import os
 import pytz
+import re
 import torch
 import yaml
 from IPython.core.display import clear_output
 from PIL import Image
-from . import video_processing
+from datetime import datetime
+from pathlib import Path
+
+from video_processing import create_mask, video_to_array_optimizing, apply_mask
 
 log = logging.getLogger('enter_system')
 
@@ -102,25 +102,12 @@ def masking_video(path_video: str,
     :param coord: coordinates of mask [(x1, y1), (x2, y2)...]
     :return: None
     """
-    mask = video_processing.create_mask(frame_size, coord)
-    frames = video_processing.video_to_array_optimizing(path_video, frame_size, 3)
-    mask_frames = video_processing.apply_mask(frames, mask)
+    mask = create_mask(frame_size, coord)
+    frames = video_to_array_optimizing(path_video, frame_size, 3)
+    mask_frames = apply_mask(frames, mask)
     gc.collect()
     clear_output()
     return frames
-
-
-def crop_image(image: np.array, coord: list) -> np.array:
-    """
-    Function for crop the image
-    :param image: image as np.array
-    :param coord: list
-    :return: np.array
-    """
-    img = Image.fromarray(image)
-    img_crop = img.crop((coord[0], coord[1], coord[2], coord[3]))
-
-    return np.array(img_crop)
 
 
 def crop_image(image: np.array, coord: list) -> np.array:
