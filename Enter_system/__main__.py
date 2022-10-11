@@ -13,7 +13,7 @@ import torch
 import yaml
 from IPython.core.display import clear_output
 from PIL import Image
-import video_processing
+from . import video_processing
 
 log = logging.getLogger('enter_system')
 

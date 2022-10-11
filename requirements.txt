@@ -48,3 +48,4 @@ thop>=0.1.1  # FLOPs computation
 pytz~=2022.4
 easyocr~=1.6.2
 moviepy~=1.0.3
+python-json-logger==2.0.4
