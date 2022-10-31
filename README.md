@@ -5,8 +5,10 @@ Team: Voronkina Daria, Zhukov Dmitriy, Kuchuganova Svetlana
 Clone repo and install [requirements.txt](https://github.com/Eleven-Team-AI/Number-detection/blob/main/requirements.txt) in a
 [**Python>=3.7.0**](https://www.python.org/) environment, including
 [**PyTorch>=1.7**](https://pytorch.org/get-started/locally/).
-[Models](https://drive.google.com/file/d/1xh2rH4VMsYWb93gmuPhrTUYevlMvhypD/view?usp=share_link)
-[Demo video](https://drive.google.com/file/d/1abnKo0wkRaQO8cnoHZR-D4faIFbLGcyh/view?usp=share_link)
+
+Link to [models](https://drive.google.com/file/d/1xh2rH4VMsYWb93gmuPhrTUYevlMvhypD/view?usp=share_link)
+
+Link to [demo video](https://drive.google.com/file/d/1abnKo0wkRaQO8cnoHZR-D4faIFbLGcyh/view?usp=share_link)
 ```bash
 git clone https://github.com/Eleven-Team-AI/Number-detection  # clone
 cd Number-detection
