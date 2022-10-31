@@ -6,7 +6,7 @@ Clone repo and install [requirements.txt](https://github.com/Eleven-Team-AI/Numb
 [**Python>=3.7.0**](https://www.python.org/) environment, including
 [**PyTorch>=1.7**](https://pytorch.org/get-started/locally/).
 
-Link to [models](https://drive.google.com/file/d/1xh2rH4VMsYWb93gmuPhrTUYevlMvhypD/view?usp=share_link)
+Link to [models](https://drive.google.com/drive/folders/1PyfU5hcCfHSb4VP2bu-QVwPG0YNe0Qa0?usp=sharing)
 
 Link to [demo video](https://drive.google.com/file/d/1abnKo0wkRaQO8cnoHZR-D4faIFbLGcyh/view?usp=share_link)
 ```bash
