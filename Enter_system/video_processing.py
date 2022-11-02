@@ -1,13 +1,12 @@
+import cv2
 import glob
+import numpy as np
 import os.path
 import time
-from typing import MutableSequence
-
-import cv2
-import numpy as np
 from PIL import Image
 from PIL import ImageDraw
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+from typing import MutableSequence
 
 
 def video_to_frames(path_video: str, path_frames: str) -> None:

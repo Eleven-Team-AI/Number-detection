@@ -52,7 +52,6 @@ def plat_detection(frame: np.array) -> list:
     results = plat_yolo_model(frame)
     labels, cord_thres = results.xyxy[0][:, -1].cpu().numpy(), results.xyxy[0][:, :-1].cpu().numpy()
     names = plat_yolo_model.names
-    detected = '-'
     for label in labels:
         detected = names[label]
         if detected == 'plat-nomor':
@@ -135,7 +134,6 @@ def worker():
                                   coord=config['constants']['coord'])
 
     for im in masked_frames:
-        # start_time = datetime.now()
         if not GATE_IS_OPEN:
             detection = car_detection(im)
             if detection == 'car' or detection == 'truck':
@@ -152,7 +150,6 @@ def worker():
                         cars = file.readlines()
 
                     cars = [elem.replace('\n', '') for elem in cars]
-                    # print(datetime.now() - start_time)
                     if recognized_code not in cars:
                         GATE_IS_OPEN = False
                         print('ALARM: CHECK CAR!!!!!!')
@@ -162,8 +159,6 @@ def worker():
                         print(f'MSK: {moscow_time} - {detection.upper()} detected - {recognized_code[:5]} - passed')
                 else:
                     log.info(f'MSK: {moscow_time} - {detection.upper()} detected - wait code detected')
-    GATE_IS_OPEN = False
-
 
 if __name__ == '__main__':
     worker()
