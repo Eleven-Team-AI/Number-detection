@@ -5,8 +5,10 @@ Team: Voronkina Daria, Zhukov Dmitriy, Kuchuganova Svetlana
 Clone repo and install [requirements.txt](https://github.com/Eleven-Team-AI/Number-detection/blob/main/requirements.txt) in a
 [**Python>=3.7.0**](https://www.python.org/) environment, including
 [**PyTorch>=1.7**](https://pytorch.org/get-started/locally/).
-[Models](https://drive.google.com/file/d/1xh2rH4VMsYWb93gmuPhrTUYevlMvhypD/view?usp=share_link)
-[Demo video](https://drive.google.com/file/d/1abnKo0wkRaQO8cnoHZR-D4faIFbLGcyh/view?usp=share_link)
+
+Link to [models](https://drive.google.com/drive/folders/1PyfU5hcCfHSb4VP2bu-QVwPG0YNe0Qa0?usp=sharing)
+
+Link to [demo video](https://drive.google.com/file/d/1abnKo0wkRaQO8cnoHZR-D4faIFbLGcyh/view?usp=share_link)
 ```bash
 git clone https://github.com/Eleven-Team-AI/Number-detection  # clone
 cd Number-detection
@@ -54,6 +56,7 @@ Plate detection - finetuned yolov5 on [Detecsi Plat NomorDataset](https://univer
 2 models were selected for OCR: [easyocr](https://github.com/jaidedai/easyocr) and [MORAN](https://github.com/Canjie-Luo/MORAN_v2). The final choice was made in favor of easyocr as showing the best results in conditions of low image quality.
 
 Easyocr output example:
+[Notebook with experiments](https://colab.research.google.com/drive/1ku7odTkO3LLpZvePPQNsztXPt0DUGyEE?usp=sharing)
 
 <img width="470" alt="Снимок экрана 2022-10-05 в 18 22 46" src="https://user-images.githubusercontent.com/55249362/194071378-6aeb6286-db26-4f15-aa70-2e0e86a08410.png">
 
