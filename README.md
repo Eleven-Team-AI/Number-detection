@@ -72,8 +72,11 @@ MORAN output example:
 |--------|:----------------------:|------:|---------:|
 | yolov5 | number plate detection | 0.929 |  mAP 0.5 |
 | yolov5 |     car detection      |  45.7 |  mAP 0.5 |
-| easyocr|          OCR           |  93.  | Accuracy |
-| MORAN  |          OCR           |  64.3  | Accuracy |
+| easyocr|          OCR           |  38.3  | Accuracy |
+| MORAN  |          OCR           |  38.3  | Accuracy |
+
+See the comparsion of models in notebook:
+https://colab.research.google.com/drive/1ku7odTkO3LLpZvePPQNsztXPt0DUGyEE?usp=sharing
 
 
 ## Selection of hyperparameters for plat detection model
