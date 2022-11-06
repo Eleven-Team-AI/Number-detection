@@ -99,4 +99,6 @@ Time to process 1 frame is 0:00:00.648164.
 The solution easy can be scaled to many cameras by Yolo utils.
 
 Solution can be reproduced on CPU.
+CPU haracteristics:
+1. 2.6GHz, 2 kernels, Intel Core i5
 
